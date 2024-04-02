@@ -1,49 +1,36 @@
 import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { deleteRecord, getRecords } from "@/utils/recordsFunctions";
 
 const MainPage = () => {
+  const router = useRouter();
   const [records, setRecords] = useState([]);
 
   const fetchRecords = async () => {
     try {
-      const response = await fetch("/api/records", {
-        method: "GET",
-      });
+      const response = await getRecords();
 
-      const data = await response.json();
-
-      if (!data?.data) {
-        return;
-      }
-
-      setRecords(data.data);
+      setRecords(response);
     } catch (error) {
       console.error(error);
     }
   };
 
-  const deleteRecord = async (event) => {
-    event.preventDefault();
-
+  const handleDeleteRecord = async (id) => {
     try {
-      const id = event.target.id;
+      const response = await deleteRecord(id);
 
-      const requestOptions = {
-        method: "DELETE",
-      };
-  
-      const response = await fetch(`/api/records?id=${id}`, requestOptions);
-      const json = await response.json();
-
-      if (json?.data?.deletedCount === 1) {
-        setRecords(records.filter((record) => record._id !== id));
+      if (response.deletedCount === 1) {
+        const newRecords = records.filter((record) => record._id !== id);
+        setRecords(newRecords);
       }
     } catch (error) {
-      console.error(error);
+      console.log(error)
     }
   };
 
-  const updateRecordHandler = (id) => {
-    window.location.href = `/update/${id}`;
+  const handleUpdateRecord = (id) => {
+    router.push(`/records/edit?id=${id}`);
   };
 
   useEffect(() => {
@@ -67,14 +54,14 @@ const MainPage = () => {
             <button
               type="button"
               className="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-              onClick={() => updateRecordHandler(record._id)}
+              onClick={() => handleUpdateRecord(record._id)}
             >
               Update
             </button>
             <button
               type="button"
               className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-              onClick={deleteRecord}
+              onClick={() => handleDeleteRecord(record._id)}
             >
               Delete
             </button>
