@@ -17,6 +17,7 @@ const RecordForm = (props) => {
   return (
     <div className="flex justify-center p-4">
       <div className="border p-4 rounded-md shadow-sm flex flex-col gap-4 w-full max-w-80">
+        <h1 className="font-bold text-center text-lg">Create new Record</h1>
         <div>
           <label
             htmlFor="title"
